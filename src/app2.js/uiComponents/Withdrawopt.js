@@ -729,7 +729,8 @@ const Withdrawopt = ({ walletUpdate }) => {
         className="leftContainer withdrawl_section"
         style={{ minHeight: "105vh", height: "100%" }}
       >
-
+<p className="pt-5 mt-5">सर्वर डाउन होने की वजह से withdrawal सेवाए कुछ समय ⏱️ के लिए बंद है कुछ समय मैं जल्द ही withdrawal शुरू हो जाएगा ।
+धन्यवाद 🙏</p>
 
         {
           (isMypayPayoutActive === false && isManualPayoutActive === false && isMypayPayoutBankActive === false && isMypayzonePayoutBankActive === false && isMypayzone2PayoutBankActive === false && isManualBankPayoutActive === false && isRazorPayPayoutActive === false && isDecentroPayoutActive === false) ?
