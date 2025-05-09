@@ -1,0 +1,9 @@
+.carousel{
+    background-color: #eee;
+    border: 1px solid #eee;
+    border-radius: 5px;
+}
+.carousel-item img{
+border-radius: 5px;
+height: 80px;
+}
