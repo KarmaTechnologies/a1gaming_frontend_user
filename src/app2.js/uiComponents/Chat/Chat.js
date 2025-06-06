@@ -6,8 +6,8 @@ import "./Chat.css";
 // import bgpic from "../../../../public/bg-pic.webp"
 
 let socket;
-// const ENDPOINT = "https://socket.a1gaming.co.in/";
- const ENDPOINT =  "http://localhost:6001";
+const ENDPOINT = "https://socket.a1gaming.co.in/";
+//  const ENDPOINT =  "https://socket.a1adda.com";
 
 const Chat = ({ user, chatoption }) => {
   const [id, setId] = useState("");
@@ -81,14 +81,14 @@ const Chat = ({ user, chatoption }) => {
     // setId(user?._id);
     // socket.emit("joined", { id: user?._id, Phone: user?.Phone, room });
 
-    if (user) {
+    if (user) { 
       const room = user.Phone.toString();
       setId(user?._id);
       socket.emit("joined", { id: user?._id, Phone: user?.Phone, room }, (response) => {
         // console.log("Server acknowledged join:", response.data);
         setRoomID(response.data._id);
       });
-    }
+    } 
   }, [user]);
 
   const startRecording = async () => {

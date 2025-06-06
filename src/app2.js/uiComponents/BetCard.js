@@ -1,6 +1,6 @@
 import React, { memo } from 'react'
 import css from "../Modulecss/Home.module.css";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import acceptSound from "./accept.mp3";
 import findGif from "../css/loading_old.gif";
 import playSound from "./play.mp3";
@@ -20,8 +20,21 @@ const BetCard = React.memo(({ allgame, user, deleteChallenge, getPost, RejectGam
   //     deleteChallenge(allgame._id);
   //   }, 60000);
   // }
+
+const history = useHistory();
+
+const handleStartGame = async (gameId) => {
+  await getPost(gameId);
+  history.push({
+    pathname: `/viewgame1/${gameId}`,
+    state: { prevPath: window.location.pathname }
+  });
+};
+
+
   
-  return (<div className={`${css.betCard} mt-2`}>
+  return (
+  <div className={`${css.betCard} mt-2`}>
     <span
       className={`${css.betCardTitle} pl-3 d-flex align-items-center text-uppercase ${css.betTitleDiv}`}
     >
@@ -41,13 +54,15 @@ const BetCard = React.memo(({ allgame, user, deleteChallenge, getPost, RejectGam
       {user == allgame.Created_by._id &&
         allgame.Status == "requested" && (<div className="d-flex ml-auto align-items-center">
 
-            <Link to={{ pathname: `/viewgame1/${allgame._id}`, state: { prevPath: window.location.pathname } }}  onClick={(e) => getPost(allgame._id)} style={{ bottom: '0' }}>
+            {/* <Link to={{ pathname: `/viewgame1/${allgame._id}`, state: { prevPath: window.location.pathname } }}  onClick={(e) => getPost(allgame._id)} style={{ bottom: '0' }}> */}
           <button 
+          onClick={() => handleStartGame(allgame._id)}
+          style={{ bottom: '0' }}
             className={`bg-success position-relative mx-1 btn-sm text-white btn-inverse-success`}
           >
             START
           </button>
-          </Link>
+          {/* </Link> */}
           <button
             className={`text-white bg-danger position-relative mx-1 btn-sm btn-outline-youtube`}
             onClick={() => RejectGame(allgame._id)} style={{ bottom: '0' }}

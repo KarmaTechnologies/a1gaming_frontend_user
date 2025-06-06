@@ -292,8 +292,8 @@ export default function Homepage({walletUpdate}) {
     return gameAmount - profit;
   }
 
-  // const SOCKET_SERVER_URL = "https://socket.a1gaming.co.in";
-  const SOCKET_SERVER_URL = "http://localhost:6001";
+  const SOCKET_SERVER_URL = "https://socket.a1gaming.co.in";
+  // const SOCKET_SERVER_URL = "https://socket.a1adda.com";
 
 
 
@@ -700,7 +700,6 @@ export default function Homepage({walletUpdate}) {
   const getPost = async (Id) => {
     if (game_type === 'ludo-classic-light-mode' || game_type === 'ludo-classic-rich-mode' || game_type === 'Ludo Ulta') {
       socket.emit('roomCode', { game_id: Id, status: 'running' })
-      
     }
     else if(game_type==='Ludo Popular') {
       socket.emit('popularroomCode', { game_id: Id, status: 'running' })
@@ -848,6 +847,8 @@ export default function Homepage({walletUpdate}) {
                 
                 
           </div>
+
+          
           <div className={css.dividerX}></div>
           <div className="px-4 py-3">
             <div className="mb-2">

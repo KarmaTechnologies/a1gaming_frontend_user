@@ -6,6 +6,7 @@ import { useHistory, useLocation } from "react-router-dom";
 import Header from "../Components/Header";
 import css from "../css/Pan.module.css";
 import playSound from "./play.mp3";
+import roomCodeSound from "./1_second_tone.mp3"
 //import Rightcontainer from '../Components/Rightcontainer';
 import Swal from "sweetalert2";
 import "../css/Loader.css";
@@ -43,6 +44,72 @@ export default function ViewGame1(props) {
   const isMounted = useRef(true);
 
   const [submitProcess, setProcess] = useState(true);
+
+  /// user details start
+
+  const [user, setUser] = useState();
+  const [userAllData, setUserAllData] = useState();
+
+  // const role = async () => {
+  //   const access_token = localStorage.getItem("token");
+  //   const headers = {
+  //     Authorization: `Bearer ${access_token}`,
+  //   };
+  //   await axios
+  //     .get(baseUrl + `me`, { headers })
+  //     .then((res) => {
+  //       setUser(res.data._id);
+  //       setUserAllData(res.data);
+  //       // // console.log(res.data._id)
+  //       Allgames(res.data._id);
+  //       getCode(res.data._id);
+  //       // setTimeout(() => {
+  //       // }, 1000);
+  //       // checkExpire();
+  //       // if(!res.data.Room_join)
+  //       // {
+  //       // }
+  //     })
+  //     .catch((e) => {
+  //       if (e?.response?.status == 401) {
+  //         localStorage.removeItem("token");
+  //         localStorage.removeItem("token");
+  //         window.location.reload();
+  //         history.push("/login");
+  //       }
+  //     });
+  // };
+
+  /// user details end
+
+  const role = async () => {
+    const access_token = localStorage.getItem("token");
+    const headers = { Authorization: `Bearer ${access_token}` };
+
+    try {
+      const res = await axios.get(baseUrl + "me", { headers });
+      const userData = res.data;
+      setUser(userData._id);
+      setUserAllData(userData);
+      await Allgames(userData._id);
+      await getCode(userData._id);
+    } catch (e) {
+      if (e?.response?.status === 401) {
+        localStorage.removeItem("token");
+        window.location.reload();
+        history.push("/login");
+      }
+    }
+  };
+
+  useEffect(() => {
+    let access_token = localStorage.getItem("token");
+    if (!access_token) {
+      window.location.reload();
+      history.push("/login");
+    }
+    role();
+  }, []);
 
   const getPost = async () => {
     const access_token = localStorage.getItem("token");
@@ -89,6 +156,10 @@ export default function ViewGame1(props) {
       setGame(patchRes?.data);
       socket.emit("sendGameData", patchRes?.data);
       socket.emit("challengeOngoing");
+
+      // ✅ Play success sound here
+      const audio = new Audio(roomCodeSound);
+      audio.play();
     } catch (e) {
       if (e?.response?.status === 401) {
         localStorage.removeItem("token");
@@ -97,43 +168,6 @@ export default function ViewGame1(props) {
       }
     }
   };
-  
-  /// user details start
-
-  const [user, setUser] = useState();
-  const [userAllData, setUserAllData] = useState();
-
-  const role = async () => {
-    const access_token = localStorage.getItem("token");
-    const headers = {
-      Authorization: `Bearer ${access_token}`,
-    };
-    await axios
-      .get(baseUrl + `me`, { headers })
-      .then((res) => {
-        setUser(res.data._id);
-        setUserAllData(res.data);
-        // // console.log(res.data._id)
-        Allgames(res.data._id);
-        getCode(res.data._id);
-        // setTimeout(() => {
-        // }, 1000);
-        // checkExpire();
-        // if(!res.data.Room_join)
-        // {
-        // }
-      })
-      .catch((e) => {
-        if (e?.response?.status == 401) {
-          localStorage.removeItem("token");
-          localStorage.removeItem("token");
-          window.location.reload();
-          history.push("/login");
-        }
-      });
-  };
-
-  /// user details end
 
   const [ALL, setALL] = useState();
 
@@ -145,27 +179,27 @@ export default function ViewGame1(props) {
 
     await axios
       .get(baseUrl + `challange/${path}`, { headers })
-      .then(async(res) => {
+      .then(async (res) => {
         if (res.data.Status == "new" || res.data.Status == "requested") {
-        //   setTimeout(async () => {
-            await axios
-              .get(baseUrl + `challange/${path}`, { headers })
-              .then((res) => {
-                if (
-                  res.data.Status == "new" ||
-                  res.data.Status == "requested"
-                ) {
+          //   setTimeout(async () => {
+          await axios
+            .get(baseUrl + `challange/${path}`, { headers })
+            .then((res) => {
+              if (
+                res.data.Status == "new" ||
+                res.data.Status == "requested"
+              ) {
                 //   history.push(props.location.state.prevPath);
-                  setProcess(false)
-                } else {
-                  setProcess(false);
-                }
-              })
-              .catch((error) => {
-                console.error(error);
-                history.push(props.location.state.prevPath);
-              });
-        //   }, 10000);
+                setProcess(false)
+              } else {
+                setProcess(false);
+              }
+            })
+            .catch((error) => {
+              console.error(error);
+              history.push(props.location.state.prevPath);
+            });
+          //   }, 10000);
         } else {
           setProcess(false);
         }
@@ -197,9 +231,9 @@ export default function ViewGame1(props) {
         //setALL(res.data)
         Allgames(userId);
         if (res.data.Accepetd_By == userId && res.data.Room_code == 0) {
-        //   setTimeout(async () => {
-        //     window.location.reload();
-        //   }, 10000);
+          //   setTimeout(async () => {
+          //     window.location.reload();
+          //   }, 10000);
         }
       });
   };
@@ -217,18 +251,18 @@ export default function ViewGame1(props) {
   };
 
   useEffect(() => {
-    // const socket = io("https://socket.a1gaming.co.in");
-    const socket = io( "http://localhost:6001");
+    const socket = io("https://socket.a1gaming.co.in");
+    // const socket = io("https://socket.a1adda.com");
 
 
     socket.on("connect", () => {
       console.log("Socket.io is connected 👍");
       setSocket(socket);
-      
+
       socket.on("getGameData", (data) => {
-         Allgames(user)
+        Allgames(user)
       });
-      
+
       socket.emit("ping");
 
       socket.on("pong", () => {
@@ -243,7 +277,7 @@ export default function ViewGame1(props) {
       });
 
       socket.on("ping", (message) => {
-       socket.emit("pong")
+        socket.emit("pong")
       });
     });
 
@@ -255,31 +289,26 @@ export default function ViewGame1(props) {
     };
   }, []);
 
-  useEffect(() => {
-    let access_token = localStorage.getItem("token");
-    if (!access_token) {
-      window.location.reload();
-      history.push("/login");
-    }
-    role();
-  }, []);
+
+
+
   const eventHandlers = {
     // Define your event handlers here
     ping: (data) => {
       socket.emit("pong");
     },
   };
-//   useEffect(() => {
-//     let access_token = localStorage.getItem("token");
-//     access_token = localStorage.getItem("token");
-//     if (!access_token) {
-//       window.location.reload();
-//       history.push("/login");
-//     }
-//     // console.log(history.location)
+  //   useEffect(() => {
+  //     let access_token = localStorage.getItem("token");
+  //     access_token = localStorage.getItem("token");
+  //     if (!access_token) {
+  //       window.location.reload();
+  //       history.push("/login");
+  //     }
+  //     // console.log(history.location)
 
-//     role();
-//   }, []);
+  //     role();
+  //   }, []);
 
   const clearImage = (e) => {
     setScrnshot1(null);
@@ -317,8 +346,8 @@ export default function ViewGame1(props) {
             // socket.emit('resultAPI');
             submitReq.current = false;
             setProcess(false);
-                        setLoading(false)
-                         toast.success('Successfully Submit!')
+            setLoading(false)
+            toast.success('Successfully Submit!')
             history.push(props.location.state.prevPath);
           })
           .catch((e) => {
@@ -331,7 +360,7 @@ export default function ViewGame1(props) {
               });
               submitReq.current = false;
               setProcess(false);
-               setLoading(false)
+              setLoading(false)
               history.push(props.location.state.prevPath);
             }
             if (e?.response?.status == 401) {
@@ -343,11 +372,11 @@ export default function ViewGame1(props) {
           });
       } else {
         submitReq.current = false;
-                setLoading(false)
+        setLoading(false)
         alert("please fill all field or Re-Select result status");
       }
     }
-            setLoading(false)
+    setLoading(false)
 
   };
 
@@ -372,31 +401,33 @@ export default function ViewGame1(props) {
     setScrnshot(e.target.files[0]);
   };
 
+  // console.log(scrnshot1, scrnshot )
+
   // ADDED BY TEAM
- /// user details end
-const handleLose=()=>{
-  setStatus("lose")
-   setScrnshot(null)
-   setScrnshot1(null)
+  /// user details end
+  const handleLose = () => {
+    setStatus("lose")
+    setScrnshot(null)
+    setScrnshot1(null)
 
-}
-const handleCancel=()=>{
-  setStatus("cancelled")
-   setScrnshot(null)
-   setScrnshot1(null)
+  }
+  const handleCancel = () => {
+    setStatus("cancelled")
+    setScrnshot(null)
+    setScrnshot1(null)
 
-}
+  }
 
 
-console.log("userData" , user)
-console.log("userData" , Game)
+  // console.log("userData111111111111", user)
+  // console.log("userData", Game)
+
   return (
     <>
       <Header user={userAllData} />
-      {/* {!Game && <div class="lds-ripple"><div></div><div></div></div>} */}
-      {Game && (
-        <div className="leftContainer">
-        
+      <div className="leftContainer">
+        {/* {!Game && <div class="lds-ripple"><div></div><div></div></div>} */}
+        {Game && (
           <div className="main-area" style={{ paddingTop: "60px" }}>
             {!Boolean(submitProcess) && (
               <div className="battleCard-bg">
@@ -498,28 +529,28 @@ console.log("userData" , Game)
                   </div>
                   <div className="thin-divider-x my-3" />
 
-                {
-                // (Game.Room_code == null && (
-                //     <div className="roomCode cxy flex-column">
-                //       Waiting for Room Code...
-                //       <h6>रूम कोड का इंतजार है।</h6>
-                //       <div className="lds-spinner">
-                //         <div></div>
-                //         <div></div>
-                //         <div></div>
-                //         <div></div>
-                //         <div></div>
-                //         <div></div>
-                //         <div></div>
-                //         <div></div>
-                //         <div></div>
-                //         <div></div>
-                //         <div></div>
-                //         <div></div>
-                //       </div>
-                //     </div>
-                //   )) ||
-                    ((Game.Room_code != 0)&& (
+                  {
+                    // (Game.Room_code == null && (
+                    //     <div className="roomCode cxy flex-column">
+                    //       Waiting for Room Code...
+                    //       <h6>रूम कोड का इंतजार है।</h6>
+                    //       <div className="lds-spinner">
+                    //         <div></div>
+                    //         <div></div>
+                    //         <div></div>
+                    //         <div></div>
+                    //         <div></div>
+                    //         <div></div>
+                    //         <div></div>
+                    //         <div></div>
+                    //         <div></div>
+                    //         <div></div>
+                    //         <div></div>
+                    //         <div></div>
+                    //       </div>
+                    //     </div>
+                    //   )) ||
+                    ((Game.Room_code != 0) && (
                       <div className="roomCode cxy flex-column">
                         <div className="text-center">
                           <div>Room Code</div>
@@ -535,30 +566,30 @@ console.log("userData" , Game)
                     )) ||
                     ((Game.Room_code == 0) &&
                       ((Game.Created_by._id == user && (
-                      <>
-                       <audio src={playSound} autoPlay>
-            </audio>
-                        <div className="roomCode cxy flex-column">
-                          Set Room Code
-                          <h6>लूडो किंग से रूम कोड अपलोड करें</h6>
-                          <input
-                            type="number"
-                            className="form-control mt-1 w-75"
-                            style={{
-                              backgroundColor: "#e8eeee",
-                              border: "1px solid #47a44780",
-                            }}
-                            value={roomcode}
-                            onChange={(e) => setRoomcode(e.target.value)}
-                          />
-                          <button
-                            className="bg-green playButton position-static mt-2"
-                            type="button"
-                            onClick={() => getPost()}
-                          >
-                            SET ROOM CODE
-                          </button>
-                        </div>
+                        <>
+                          {/* <audio src={playSound} autoPlay>
+            </audio> */}
+                          <div className="roomCode cxy flex-column">
+                            Set Room Code
+                            <h6>लूडो किंग से रूम कोड अपलोड करें</h6>
+                            <input
+                              type="number"
+                              className="form-control mt-1 w-75"
+                              style={{
+                                backgroundColor: "#e8eeee",
+                                border: "1px solid #47a44780",
+                              }}
+                              value={roomcode}
+                              onChange={(e) => setRoomcode(e.target.value)}
+                            />
+                            <button
+                              className="bg-green playButton position-static mt-2"
+                              type="button"
+                              onClick={() => getPost()}
+                            >
+                              SET ROOM CODE
+                            </button>
+                          </div>
                         </>
                       )) ||
                         (Game.Accepetd_By._id == user && (
@@ -941,7 +972,7 @@ console.log("userData" , Game)
                             {fecthStatus == null &&
                               fecthStatus == undefined && (
                                 <input
-                                disabled={loading}
+                                  disabled={loading}
                                   type="submit"
                                   className="btn btn-danger mt-3 text-white"
                                   id="post"
@@ -961,7 +992,7 @@ console.log("userData" , Game)
                     {/* <button type='submit' className='btn btn-danger mt-3 text-white' id="post" onSubmit={(e) => { e.preventDefault(); Result() }}>Post Result</button> */}
                     {fecthStatus == null && fecthStatus == undefined && (
                       <input
-                      disabled={loading}
+                        disabled={loading}
                         type="submit"
                         className="btn btn-danger mt-3 text-white"
                         id="post"
@@ -974,19 +1005,20 @@ console.log("userData" , Game)
               </div>
             )}
           </div>
-        </div>
-      )}
-      {Boolean(submitProcess) && (
-        <div
-          className="loaderReturn"
-          style={{ zIndex: "99", minHeight: "100vh" }}
-        >
-          <img
-            src={process.env.PUBLIC_URL + "/Images/LandingPage_img/loader1.gif"}
-            style={{ width: "100%" }}
-          />
-        </div>
-      )}
+        )}
+
+        {Boolean(submitProcess) && (
+          <div
+            className="loaderReturn"
+            style={{ zIndex: "99", minHeight: "100vh" }}
+          >
+            <img
+              src={process.env.PUBLIC_URL + "/Images/LandingPage_img/loader_change.gif"}
+              style={{ width: "100%", maxWidth: "125px" }}
+            />
+          </div>
+        )}
+      </div>
       <div class="divider-y"></div>
     </>
   );

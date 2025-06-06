@@ -61,6 +61,7 @@ export default function Homepage({walletUpdate}) {
     })
   };
 
+
   /// user details end
 
   const [game_type, setGame_type] = useState(
@@ -193,6 +194,7 @@ export default function Homepage({walletUpdate}) {
   //const [ALL, setALL] = useState();
   const [runningGames, setRunningGames] = useState();
   const [ownRunning,setOwnRunning]=useState([]);
+
   const Allgames = async () => {
     const access_token = localStorage.getItem("token");
     const headers = {
@@ -290,15 +292,8 @@ export default function Homepage({walletUpdate}) {
     return gameAmount - profit;
   }
 
-  // const SOCKET_SERVER_URL = "https://socket.a1gaming.co.in";
-  const SOCKET_SERVER_URL = "http://localhost:6001";
-
-
-
-
-
-
-  
+  const SOCKET_SERVER_URL = "https://socket.a1gaming.co.in";
+  // const SOCKET_SERVER_URL = "https://socket.a1adda.com"; 
 
   useEffect(() => {
     const socket = io(SOCKET_SERVER_URL, {
@@ -313,6 +308,8 @@ export default function Homepage({walletUpdate}) {
     socket.on("connect", () => {
       console.log("Socket connected");
     });
+
+    
 
     socket.on("disconnect", (reason) => {
       console.log("Socket disconnected: ", reason);
@@ -523,7 +520,6 @@ export default function Homepage({walletUpdate}) {
    
   }, [mount]);
   //accept Challange
-
   const AcceptChallang = (id) => {
     const access_token = localStorage.getItem("token");
     const headers = {
@@ -703,8 +699,6 @@ export default function Homepage({walletUpdate}) {
      
     }
   }
-
-
 
   return (
     <>

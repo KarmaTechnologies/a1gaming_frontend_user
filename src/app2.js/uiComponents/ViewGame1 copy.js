@@ -251,8 +251,8 @@ export default function ViewGame1(props) {
         if (isMounted.current) {
           clearTimeout(socket.pingTimeout);
           setSocket(undefined);
-          let socket = new WebSocket("wss://socket.a1gaming.co.in/server");
-          //socket = new WebSocket("ws://192.168.29.119:5001/server");
+          // let socket = new WebSocket("wss://socket.a1gaming.co.in/server");
+          socket = new WebSocket("wss://socket.a1adda.com/server");
           openFunc();
           listenFunc();
         }
